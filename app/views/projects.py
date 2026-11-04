@@ -50,6 +50,8 @@ with st.form("add_project", clear_on_submit=True):
             st.error("Please type a project name.")
 
 
-if st.button("Reset demo data"):
-    seed_database()
-    st.rerun()
+with st.popover("Reset demo data"):
+    st.write("This deletes everything and puts the demo data back.")
+    if st.button("Yes, reset", type="primary"):
+        seed_database()
+        st.rerun()

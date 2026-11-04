@@ -45,9 +45,12 @@ for task in tasks:
         execute("UPDATE tasks SET is_done = ? WHERE id = ?", int(is_done), task["id"])
         st.rerun()
 
-    if delete_column.button("Delete", key=f"delete_{task['id']}"):
-        execute("DELETE FROM tasks WHERE id = ?", task["id"])
-        st.rerun()
+    # A popover is a button that opens a little box - here it holds the "are you sure?" button
+    with delete_column.popover("Delete", key=f"delete_{task['id']}"):
+        st.write("This deletes this task permanently.")
+        if st.button("Yes, delete", key=f"confirm_delete_{task['id']}"):
+            execute("DELETE FROM tasks WHERE id = ?", task["id"])
+            st.rerun()
 
 with st.form("add_task", clear_on_submit=True):
     title = st.text_input("New task")
@@ -58,7 +61,9 @@ with st.form("add_task", clear_on_submit=True):
 
 st.divider()
 
-if st.button("Delete this project", type="primary"):
-    # The tasks go too, because the schema says ON DELETE CASCADE
-    execute("DELETE FROM projects WHERE id = ?", project_id)
-    st.switch_page("views/projects.py")
+with st.popover("Delete this project", type="primary"):
+    st.write("This deletes the project and all its tasks.")
+    if st.button("Yes, delete", type="primary"):
+        # The tasks go too, because the schema says ON DELETE CASCADE
+        execute("DELETE FROM projects WHERE id = ?", project_id)
+        st.switch_page("views/projects.py")
